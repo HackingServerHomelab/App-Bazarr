@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  bazarr:
+    image: linuxserver/bazarr:latest
+    container_name: bazarr
+    hostname: bazarr
+    restart: unless-stopped
+    volumes:
+      - ../Data/config:/config
+      - ../Data/movies:/movies
+      - ../Data/tv:/tv
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    labels:
+      # Traefik Labels
+      - "traefik.enable=true"
+      # HTTPS Labels
+      - "traefik.http.routers.bazarr.rule=Host(`localhost`)" # Domain Name
+      - "traefik.http.routers.bazarr.entrypoints=web-secure"
+      - "traefik.http.routers.bazarr.middlewares=default-headers@file"
+      - "traefik.http.routers.bazarr.service=bazarr"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=80" # Proxied Port
